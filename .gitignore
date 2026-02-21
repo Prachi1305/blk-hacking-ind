@@ -35,8 +35,8 @@ coverage/
 .DS_Store
 Thumbs.db
 
-# Docker
-.dockerignore
+# Docker build artifacts (keep .dockerignore in version control)
+
 
 # Environment / secrets
 .env
