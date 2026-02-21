@@ -1,0 +1,43 @@
+## .NET gitignore
+
+# Build outputs
+bin/
+obj/
+out/
+
+# Visual Studio / Rider
+.vs/
+.idea/
+*.user
+*.suo
+*.swp
+
+# Publish output
+publish/
+
+# NuGet
+*.nupkg
+*.snupkg
+packages/
+project.lock.json
+project.fragment.lock.json
+artifacts/
+*.nuget.props
+*.nuget.targets
+
+# dotnet test / coverage
+TestResults/
+coverage/
+*.coverage
+*.coveragexml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+.dockerignore
+
+# Environment / secrets
+.env
+appsettings.Development.json

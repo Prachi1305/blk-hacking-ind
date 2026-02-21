@@ -1,0 +1,19 @@
+services:
+  blk-hacking-ind:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: blk-hacking-ind-prachi-gaikwad
+    container_name: blk-hacking-ind-prachi-gaikwad
+    ports:
+      - "5477:5477"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:5477
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5477/blackrock/challenge/v1/performance"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
