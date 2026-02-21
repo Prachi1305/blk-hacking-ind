@@ -17,6 +17,7 @@ investment options.
 7. [Run with Docker Compose](#7-run-with-docker-compose)
 8. [API Reference](#8-api-reference)
 9. [Sample Requests & Expected Outputs](#9-sample-requests--expected-outputs)
+   - 9.1 Parse | 9.2 Validator | 9.3 Filter | 9.4 returns:nps | 9.5 returns:index
 10. [Run Tests](#10-run-tests)
 11. [Edge Cases Handled](#11-edge-cases-handled)
 
@@ -77,7 +78,7 @@ blk-hacking-ind/
 │   ├── TransactionService.cs      # period-processing logic
 │   └── ReturnsService.cs          # compound interest, tax, inflation
 ├── test/
-│   └── ChallengeTests.cs          # xUnit unit + integration tests
+│   └── ChallengTests.cs           # xUnit unit + integration tests
 ├── Program.cs
 ├── blk-hacking-ind.csproj
 ├── Dockerfile
@@ -111,11 +112,13 @@ dotnet run
 ## 6. Run with Docker
 
 ```bash
-# Build
+# Build locally
 docker build -t blk-hacking-ind-prachi-gaikwad .
-
-# Run
 docker run -d -p 5477:5477 blk-hacking-ind-prachi-gaikwad
+
+# OR pull from Docker Hub (pre-built)
+docker pull prachi1305/blk-hacking-ind-prachi-gaikwad:latest
+docker run -d -p 5477:5477 prachi1305/blk-hacking-ind-prachi-gaikwad:latest
 ```
 
 ---
@@ -173,7 +176,28 @@ POST /blackrock/challenge/v1/transactions:parse
 }
 ```
 
-### 9.2 filter (q + p + k)
+### 9.2 Validator
+
+**Request**
+```json
+POST /blackrock/challenge/v1/transactions:validator
+{
+  "wage": 50000,
+  "transactions": [
+    { "date": "2023-10-12 20:15:00", "amount": 250, "ceiling": 300, "remanent": 50 },
+    { "date": "2023-02-28 15:49:00", "amount": 375, "ceiling": 400, "remanent": 25 },
+    { "date": "2023-07-01 21:59:00", "amount": 620, "ceiling": 700, "remanent": 80 },
+    { "date": "2023-12-17 08:09:00", "amount": 480, "ceiling": 500, "remanent": 20 }
+  ]
+}
+```
+
+**Response**
+```json
+{ "valid": [ ...all 4 transactions... ], "invalid": [], "duplicates": [] }
+```
+
+### 9.3 Filter (q + p + k)
 
 **Request**
 ```json
@@ -196,12 +220,42 @@ POST /blackrock/challenge/v1/transactions:filter
 
 **Expected effective remanents:** Oct-12 → 75, Feb-28 → 25, Jul-01 → 0, Dec-17 → 45
 
-### 9.3 returns:index (PDF example)
+### 9.4 returns:nps (PDF example)
+
+**Request**
+```json
+POST /blackrock/challenge/v1/returns:nps
+{
+  "age": 29, "wage": 50000, "inflation": 0.055,
+  "q": [{ "fixed": 0, "start": "2023-07-01 00:00:00", "end": "2023-07-31 23:59:00" }],
+  "p": [{ "extra": 25, "start": "2023-10-01 08:00:00", "end": "2023-12-31 19:59:00" }],
+  "k": [
+    { "start": "2023-03-01 00:00:00", "end": "2023-11-30 23:59:00" },
+    { "start": "2023-01-01 00:00:00", "end": "2023-12-31 23:59:00" }
+  ],
+  "transactions": [
+    { "date": "2023-10-12 20:15:00", "amount": 250, "ceiling": 300, "remanent": 50 },
+    { "date": "2023-02-28 15:49:00", "amount": 375, "ceiling": 400, "remanent": 25 },
+    { "date": "2023-07-01 21:59:00", "amount": 620, "ceiling": 700, "remanent": 80 },
+    { "date": "2023-12-17 08:09:00", "amount": 480, "ceiling": 500, "remanent": 20 }
+  ]
+}
+```
 
 **Expected output for k2 (full year):**
 ```json
 { "start": "2023-01-01 00:00:00", "end": "2023-12-31 23:59:00",
-  "amount": 145.0, "profits": ~1684, "taxBenefit": 0 }
+  "amount": 145.0, "profits": 86.88, "taxBenefit": 0 }
+```
+
+### 9.5 returns:index (PDF example)
+
+**Request** — same body as `returns:nps` above, use endpoint `/blackrock/challenge/v1/returns:index`
+
+**Expected output for k2 (full year):**
+```json
+{ "start": "2023-01-01 00:00:00", "end": "2023-12-31 23:59:00",
+  "amount": 145.0, "profits": 1684.51, "taxBenefit": 0 }
 ```
 
 ---
@@ -213,6 +267,8 @@ POST /blackrock/challenge/v1/transactions:filter
 # Validation   : TransactionService + ReturnsService logic
 # Command:
 dotnet test test/blk-hacking-ind.Tests.csproj --logger "console;verbosity=detailed"
+
+# Expected: 28 tests passed, 0 failed
 ```
 
 ---
