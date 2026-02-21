@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace BlkHackingInd.Controllers;
 
 [ApiController]
-[Route("blackrock/challenge/v1/returns")]
+[Route("blackrock/challenge/v1")]
 public class ReturnsController : ControllerBase
 {
     private readonly ReturnsService     _ret;
@@ -25,7 +25,7 @@ public class ReturnsController : ControllerBase
     }
 
     // ── NPS ───────────────────────────────────────────────────
-    [HttpPost(":nps")]
+    [HttpPost("returns:nps")]
     [ProducesResponseType(typeof(ReturnsResponse), 200)]
     [ProducesResponseType(400)]
     public IActionResult Nps([FromBody] ReturnsRequest req)
@@ -38,7 +38,7 @@ public class ReturnsController : ControllerBase
     }
 
     // ── Index Fund ────────────────────────────────────────────
-    [HttpPost(":index")]
+    [HttpPost("returns:index")]
     [ProducesResponseType(typeof(ReturnsResponse), 200)]
     [ProducesResponseType(400)]
     public IActionResult Index([FromBody] ReturnsRequest req)

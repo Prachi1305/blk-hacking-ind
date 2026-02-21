@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace BlkHackingInd.Controllers;
 
 [ApiController]
-[Route("blackrock/challenge/v1/transactions")]
+[Route("blackrock/challenge/v1")]
 public class TransactionsController : ControllerBase
 {
     private readonly TransactionService _svc;
@@ -21,7 +21,7 @@ public class TransactionsController : ControllerBase
     public TransactionsController(TransactionService svc) => _svc = svc;
 
     // ── 1. Parse ──────────────────────────────────────────────
-    [HttpPost(":parse")]
+    [HttpPost("transactions:parse")]
     [ProducesResponseType(typeof(ParseResponse), 200)]
     [ProducesResponseType(typeof(ProblemDetails), 400)]
     public IActionResult Parse([FromBody] ParseRequest req)
@@ -40,7 +40,7 @@ public class TransactionsController : ControllerBase
     }
 
     // ── 2. Validate ───────────────────────────────────────────
-    [HttpPost(":validator")]
+    [HttpPost("transactions:validator")]
     [ProducesResponseType(typeof(ValidatorResponse), 200)]
     [ProducesResponseType(typeof(ProblemDetails), 400)]
     public IActionResult Validate([FromBody] ValidatorRequest req)
@@ -61,7 +61,7 @@ public class TransactionsController : ControllerBase
     }
 
     // ── 3. Filter (q + p + k) ─────────────────────────────────
-    [HttpPost(":filter")]
+    [HttpPost("transactions:filter")]
     [ProducesResponseType(typeof(FilterResponse), 200)]
     [ProducesResponseType(typeof(ProblemDetails), 400)]
     public IActionResult Filter([FromBody] FilterRequest req)
